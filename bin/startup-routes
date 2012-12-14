@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var startup = require('commander')
+  , join = require('path').join
+  , http = require('http')
+  , Table = require('cli-table');
+
+startup
+  .version(require(join(__dirname, "../package.json")).version)
+  .option('-p --path', 'path to file', 'app.js')
+  .option('-d --dev', 'run in development mode', false)
+  .parse(process.argv);
+
+var path = startup.path?
+            join(process.cwd(), startup.path):
+            join(process.cwd(), 'app');
+
+var app = require(path)
+  , port = process.env.PORT || 3000;
+
+var table = new Table({
+  head: ["Method", "Route", "Callbacks"],
+  colWidths: [8, 20, 70]
+});
+
+for(var method in app.routes) {
+  app.routes[method].forEach(function(route) {
+    table.push([method, route.path, route.callbacks.join("\n")]);
+  });
+}
+
+console.log(table.toString());
