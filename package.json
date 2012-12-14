@@ -6,9 +6,9 @@
     "test": "./node_modules/.bin/mocha"
   },
   "bin": {
-    "startup": "bin/startup"
-    "startup-middleware": "bin/startup-middleware"
-    "startup-settings": "bin/startup-settings"
+    "startup": "bin/startup",
+    "startup-middleware": "bin/startup-middleware",
+    "startup-settings": "bin/startup-settings",
     "startup-start": "bin/startup-start"
   },
   "repository": {
