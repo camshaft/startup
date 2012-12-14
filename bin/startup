@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var startup = require('commander')
+  , join = require('path').join;
+
+startup
+  .version(require(join(__dirname, "../package.json")).version)
+  .command('start [path]', 'start app at path')
+  .command('middleware [path]', 'list app middleware')
+  .command('settings [path]', 'list app settings')
+  .parse(process.argv);

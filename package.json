@@ -1,0 +1,32 @@
+{
+  "name": "startup",
+  "version": "0.0.0",
+  "description": "Node.js HTTP app runner",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha"
+  },
+  "bin": {
+    "startup": "bin/startup"
+    "startup-middleware": "bin/startup-middleware"
+    "startup-settings": "bin/startup-settings"
+    "startup-start": "bin/startup-start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/CamShaft/startup.git"
+  },
+  "keywords": [
+    "app",
+    "runner",
+    "express",
+    "connect",
+    "http"
+  ],
+  "author": "Cameron Bytheway <cameron@nujii.com>",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "commander": "~1.1.1",
+    "cli-table": "~0.2.0"
+  }
+}

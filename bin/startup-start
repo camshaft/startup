@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var startup = require('commander')
+  , join = require('path').join
+  , http = require('http')
+  , domain = require('domain');
+
+startup
+  .version(require(join(__dirname, "../package.json")).version)
+  .option('-p --path', 'path to file', 'app.js')
+  .option('-d --dev', 'run in development mode', false)
+  .parse(process.argv);
+
+var path = startup.path?
+            join(process.cwd(), startup.path):
+            join(process.cwd(), 'app');
+
+var app = require(path)
+  , port = process.env.PORT || 3000;
+
+// create a top-level domain for the server
+var serverDomain = domain.create();
+
+serverDomain.run(function() {
+  http.createServer(function(req, res) {
+    var reqd = domain.create();
+    reqd.add(req);
+    reqd.add(res);
+    reqd.on('error', function(err) {
+      console.error('Error', r, req.url);
+      try {
+        res.writeHead(500);
+        res.end('Error occurred, sorry.');
+        res.on('close', function() {
+          // forcibly shut down any other things added to this domain
+          reqd.dispose();
+        });
+      } catch (err) {
+        console.error('Error sending 500', err, req.url);
+        // tried our best.  clean up anything remaining.
+        reqd.dispose();
+      }
+    });
+    // Call our app in the req domain
+    reqd.bind(function() {
+      return app(req, res);
+    })();
+  }).listen(port, function(){
+    console.log("Server listening on port " + port);
+  });
+});
