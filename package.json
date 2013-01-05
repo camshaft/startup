@@ -8,6 +8,7 @@
   "bin": {
     "startup": "bin/startup",
     "startup-middleware": "bin/startup-middleware",
+    "startup-routes": "bin/startup-routes",
     "startup-settings": "bin/startup-settings",
     "startup-start": "bin/startup-start"
   },
