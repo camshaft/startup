@@ -6,9 +6,9 @@ Node.js HTTP app runner
 Features
 --------
 
-* Auto Port Binding
-* Error Domains
-* Hot-Reloading
+* [Port Binding](#port-binding)
+* [Hot-Reloading](#hot-reload)
+* [Domains](#domains)
 
 Usage
 -----
@@ -80,17 +80,22 @@ Lists loaded middleware (express only) without running the app.
 
 Lists app settings (express only) without running the app.
 
+Port Binding
+------------
+
+`startup` will look for the `PORT` environment variable and try to bind to it. If not value is found, it defaults to `3000`.
+
 Hot-Reload
 ----------
 
 To enable hot-reload, set the `NODE_ENV` environment variable to `development`.
 
-Read more about the library `startup` uses, [node-dev](https://github.com/fgnass/node-dev).
+Read more about [node-dev](https://github.com/fgnass/node-dev), the tool `startup` uses.
 
 Domains
 -------
 
-[Domains](http://nodejs.org/api/domain.html) were introducted in `v0.8` and act as a way to isolate uncaught exceptions in a process. This proves useful for http servers in which each request gets set on its own domain.
+[Domains](http://nodejs.org/api/domain.html) were introducted in `v0.8` and act as a way to isolate uncaught exceptions in a process. This proves useful for http servers when we want each request to be handled in a unique domain, as to not crash the whole server.
 
 Setting it up requires a bit of boilerplate code that comes built in to `startup`.
 
