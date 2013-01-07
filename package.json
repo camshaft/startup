@@ -1,6 +1,6 @@
 {
   "name": "startup",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Node.js HTTP app runner",
   "scripts": {
     "test": "./node_modules/.bin/mocha"
@@ -21,13 +21,15 @@
     "runner",
     "express",
     "connect",
-    "http"
+    "http",
+    "development"
   ],
   "author": "Cameron Bytheway <cameron@nujii.com>",
   "license": "MIT",
   "readmeFilename": "README.md",
   "dependencies": {
     "commander": "~1.1.1",
-    "cli-table": "~0.2.0"
+    "cli-table": "~0.2.0",
+    "node-dev": "~0.2.0"
   }
 }

@@ -6,8 +6,8 @@
 
 var startup = require('commander')
   , join = require('path').join
-  , http = require('http')
-  , domain = require('domain');
+  , child_process = require('child_process')
+  , runner = require('../lib/runner');
 
 startup
   .version(require(join(__dirname, "../package.json")).version)
@@ -15,37 +15,26 @@ startup
   .option('-d --dev', 'run in development mode', false)
   .parse(process.argv);
 
+// TODO default to package.json#main
 var path = startup.path?
             join(process.cwd(), startup.path):
             join(process.cwd(), 'app');
 
-var app = require(path)
-  , port = process.env.PORT || 3000;
+if (process.env.NODE_ENV=="development" || startup.dev) {
 
-var serverDomain = domain.create();
+  var child = child_process.spawn(__dirname+"/../node_modules/.bin/node-dev", [__dirname+"/../lib/dev-wrapper", path]);
 
-serverDomain.run(function() {
-  http.createServer(function(req, res) {
-    var reqd = domain.create();
-    reqd.add(req);
-    reqd.add(res);
-    reqd.on('error', function(err) {
-      console.error('Error', err, req.url);
-      try {
-        // TODO pass on to app's errorHandler
-        res.writeHead(500);
-        res.end('Error occurred, sorry.');
-        res.on('close', function() {
-          reqd.dispose();
-        });
-      } catch (err) {
-        console.error('Error sending 500', err, req.url);
-        reqd.dispose();
-      }
-    });
-    // Call our app in the req domain
-    reqd.bind(app)(req, res);
-  }).listen(port, function(){
-    console.log("Server listening on port " + port);
+  child.stdout.on("data", function(data) {
+    process.stdout.write(data.toString());
   });
-});
+  child.stderr.on("data", function(data) {
+    process.stdout.write(data.toString());
+  });
+  child.on("exit", function(code) {
+    exit(code);
+  });
+
+}
+else {
+  runner(path);
+};
