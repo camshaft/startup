@@ -25,10 +25,10 @@ if (process.env.NODE_ENV=="development" || startup.dev) {
   var child = child_process.spawn(__dirname+"/../node_modules/.bin/node-dev", [__dirname+"/../lib/dev-wrapper", path]);
 
   child.stdout.on("data", function(data) {
-    process.stdout.write(data.toString());
+    process.stdout.write(data);
   });
   child.stderr.on("data", function(data) {
-    process.stdout.write(data.toString());
+    process.stdout.write(data);
   });
   child.on("exit", function(code) {
     exit(code);
