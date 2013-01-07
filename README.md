@@ -19,11 +19,11 @@ All startup requires is an exported http app:
 ```js
 var express = require("express");
 
-// Export the http app
+// Export the express app
 var app = module.exports = express();
 
 app.get("/", function (req, res){
-  res.send("Hello!")
+  res.send("Hello!");
 });
 ```
 
@@ -31,11 +31,11 @@ app.get("/", function (req, res){
 ```js
 var connect = require("connect");
 
-// Export the http app
+// Export the connect app
 var app = module.exports = connect();
 
 app.use(function (req, res, next){
-  res.send("Hello!")
+  res.send("Hello!");
 });
 ```
 
@@ -99,7 +99,7 @@ You can also provide a custom error handler for when you do get an uncaught exce
 ```js
 var express = require("express");
 
-// Export the http app
+// Export the express app
 var app = module.exports = express();
 
 app.get("/", function (req, res){
