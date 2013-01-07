@@ -27,6 +27,9 @@
   "author": "Cameron Bytheway <cameron@nujii.com>",
   "license": "MIT",
   "readmeFilename": "README.md",
+  "engines": {
+    "node": "0.8.x"
+  },
   "dependencies": {
     "commander": "~1.1.1",
     "cli-table": "~0.2.0",
