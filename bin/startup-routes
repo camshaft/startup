@@ -27,6 +27,8 @@ var table = new Table({
   colWidths: [8, 20, 70]
 });
 
+if (!app.routes) return console.error("Express required for this feature");
+
 for(var method in app.routes) {
   app.routes[method].forEach(function(route) {
     table.push([method, route.path, route.callbacks.join("\n")]);

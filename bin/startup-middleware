@@ -27,6 +27,8 @@ var table = new Table({
   colWidths: [20, 60]
 });
 
+if (!app.stack) return console.error("Express or Connect required for this feature");
+
 app.stack.forEach(function(middleware) {
   table.push([(middleware.route || '/'), middleware.handle.name]);
 });

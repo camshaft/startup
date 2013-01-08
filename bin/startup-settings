@@ -27,6 +27,8 @@ var table = new Table({
   colWidths: [20, 80]
 });
 
+if (!app.settings) return console.error("Express required for this feature");
+
 for(var key in app.settings) {
   table.push([key, app.settings[key]]);
 }
