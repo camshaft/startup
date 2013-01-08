@@ -31,7 +31,7 @@ if (process.env.NODE_ENV=="development" || startup.dev) {
     process.stdout.write(data);
   });
   child.on("exit", function(code) {
-    exit(code);
+    process.exit(code);
   });
 
 }
