@@ -36,5 +36,7 @@ if (process.env.NODE_ENV=="development" || startup.dev) {
 
 }
 else {
-  runner(path);
+  var server = runner(path);
+
+  require("../lib/sigterm")(server);
 };
