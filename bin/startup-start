@@ -22,6 +22,8 @@ var path = startup.path?
 
 if (process.env.NODE_ENV=="development" || startup.dev) {
 
+  console.log("Auto-Reload Enabled");
+
   var child = child_process.spawn(__dirname+"/../node_modules/.bin/node-dev", [__dirname+"/../lib/dev-wrapper", path]);
 
   child.stdout.on("data", function(data) {
@@ -40,3 +42,6 @@ else {
 
   require("../lib/sigterm")(server);
 };
+
+
+process.on("SIGTERM", console.log);
