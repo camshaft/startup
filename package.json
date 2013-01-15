@@ -1,16 +1,12 @@
 {
   "name": "startup",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Node.js HTTP app runner",
   "scripts": {
     "test": "./node_modules/.bin/mocha"
   },
   "bin": {
-    "startup": "bin/startup",
-    "startup-middleware": "bin/startup-middleware",
-    "startup-routes": "bin/startup-routes",
-    "startup-settings": "bin/startup-settings",
-    "startup-start": "bin/startup-start"
+    "startup": "bin/startup"
   },
   "repository": {
     "type": "git",

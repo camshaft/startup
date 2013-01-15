@@ -9,7 +9,26 @@ var startup = require('commander')
 
 startup
   .version(require(join(__dirname, "../package.json")).version)
-  .command('start [path]', 'start app at path')
-  .command('middleware [path]', 'list app middleware')
-  .command('settings [path]', 'list app settings')
+  .option('-p --path', 'path to file', 'app.js')
+  .option('-d --dev', 'run in development mode', false)
   .parse(process.argv);
+
+
+var path = startup.path?
+            join(process.cwd(), startup.path):
+            join(process.cwd(), 'app');
+
+switch (startup.args[0]) {
+  case "middleware":
+    require("../lib/commands/middleware")(path, startup.dev)
+    break;
+  case "settings":
+    require("../lib/commands/settings")(path, startup.dev)
+    break;
+  case "routes":
+    require("../lib/commands/routes")(path, startup.dev)
+    break;
+  case "start":
+  default:
+    require("../lib/commands/start")(path, startup.dev);
+}
