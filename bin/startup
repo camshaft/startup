@@ -9,26 +9,51 @@ var startup = require('commander')
 
 startup
   .version(require(join(__dirname, "../package.json")).version)
-  .option('-p --path', 'path to file', 'app.js')
-  .option('-d --dev', 'run in development mode', false)
-  .parse(process.argv);
+  .option('-p, --path <path>', 'path to file')
+  .option('-d, --dev', 'run in development mode', false);
 
+var path;
 
-var path = startup.path?
-            join(process.cwd(), startup.path):
-            join(process.cwd(), 'app');
-
-switch (startup.args[0]) {
-  case "middleware":
-    require("../lib/commands/middleware")(path, startup.dev)
-    break;
-  case "settings":
-    require("../lib/commands/settings")(path, startup.dev)
-    break;
-  case "routes":
-    require("../lib/commands/routes")(path, startup.dev)
-    break;
-  case "start":
-  default:
-    require("../lib/commands/start")(path, startup.dev);
+if (startup.path) {
+  path = join(process.cwd(), startup.path);
 }
+else {
+  try {
+    // Try to find it in the `package.json`
+    path = join(process.cwd(), require(join(process.cwd(), "package.json")).main);
+  }
+  catch (e) {
+    // Default to `app.js`
+    path = join(process.cwd(), 'app');
+  }
+}           
+
+startup
+  .command("start")
+  .description("start app server")
+  .action(function() {
+    require("../lib/commands/start")(path, startup.dev);
+  });
+
+startup
+  .command("middleware")
+  .description("list middleware installed")
+  .action(function() {
+    require("../lib/commands/middleware")(path, startup.dev);
+  });
+
+startup
+  .command("settings")
+  .description("list app settings")
+  .action(function() {
+    require("../lib/commands/settings")(path, startup.dev);
+  });
+
+startup
+  .command("routes")
+  .description("list app routes")
+  .action(function() {
+    require("../lib/commands/routes")(path, startup.dev);
+  });
+
+startup.parse(process.argv);
