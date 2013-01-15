@@ -29,6 +29,7 @@
   "dependencies": {
     "commander": "~1.1.1",
     "cli-table": "~0.2.0",
-    "node-dev": "~0.2.0"
+    "node-dev": "~0.2.0",
+    "node-uuid": "~1.4.0"
   }
 }
