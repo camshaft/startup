@@ -31,5 +31,9 @@
     "cli-table": "~0.2.0",
     "node-dev": "~0.2.0",
     "node-uuid": "~1.4.0"
+  },
+  "devDependencies": {
+    "should": "~1.2.1",
+    "mocha": "~1.8.1"
   }
 }
