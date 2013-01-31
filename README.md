@@ -10,6 +10,7 @@ Features
 * [Hot-Reloading](#hot-reload)
 * [Domains](#domains)
 * [Cluster](#cluster)
+* [SIGTERM and SIGINT handling](#sigterm-and-sigint)
 
 Usage
 -----
@@ -121,3 +122,9 @@ Cluster
 -------
 
 [Cluster](http://nodejs.org/api/cluster.html) allows a server to take advantage of all of the cores on a system instead of being limited by node's single thread. Executing `startup start --cluster` will enable cluster mode for all of the cpu's on the machine.
+
+
+SIGTERM and SIGINT
+------------------
+
+`startup` reacts to system messages to enable clean exits. When it receives a SIGTERM it stops accepting connections and gives all of the current connections 3 seconds (overridable by setting SOCKET_TIMEOUT) to clean up and shut down. In environments like heroku it is very important the server reacts to these messages since the platform can shut it down at any time.
