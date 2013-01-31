@@ -9,6 +9,7 @@ Features
 * [Port Binding](#port-binding)
 * [Hot-Reloading](#hot-reload)
 * [Domains](#domains)
+* [Cluster](#cluster)
 
 Usage
 -----
@@ -88,7 +89,7 @@ Port Binding
 Hot-Reload
 ----------
 
-To enable hot-reload, set the `NODE_ENV` environment variable to `development`.
+To enable hot-reload, set the `NODE_ENV` environment variable to `development`. You may also specify --dev to force it.
 
 Read more about [node-dev](https://github.com/fgnass/node-dev), the tool `startup` uses.
 
@@ -115,3 +116,8 @@ module.exports.errorHandler = function (err, req, res) {
   res.send("There was an error!");
 };
 ```
+
+Cluster
+-------
+
+[Cluster](http://nodejs.org/api/cluster.html) allows a server to take advantage of all of the cores on a system instead of being limited by node's single thread. Executing `startup start --cluster` will enable cluster mode for all of the cpu's on the machine.

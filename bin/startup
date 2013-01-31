@@ -8,53 +8,61 @@ var startup = require('commander')
   , join = require('path').join;
 
 startup
-  .version(require(join(__dirname, "../package.json")).version)
-  .option('-p, --path <path>', 'path to file')
-  .option('-d, --dev', 'run in development mode', false);
+  .version(require(join(__dirname, "../package.json")).version);
 
-var path;
-
-if (startup.path) {
-  path = join(process.cwd(), startup.path);
-}
-else {
-  try {
-    // Try to find it in the `package.json`
-    path = join(process.cwd(), require(join(process.cwd(), "package.json")).main);
+function load(args) {
+  if (args.path) {
+    return join(process.cwd(), args.path);
   }
-  catch (e) {
-    // Default to `app.js`
-    path = join(process.cwd(), 'app');
+  else {
+    try {
+      // Try to find it in the `package.json`
+      return join(process.cwd(), require(join(process.cwd(), "package.json")).main);
+    }
+    catch (e) {
+      // Default to `app.js`
+      return join(process.cwd(), 'app');
+    }
   }
-}           
+};        
 
 startup
   .command("start")
   .description("start app server")
-  .option('-C, --cluster', 'run a cluster', false)
-  .action(function() {
-    require("../lib/commands/start")(path, startup.dev, startup.cluster);
+  .option('-p, --path <path>', 'path to file')
+  .option('-d, --dev', 'run in development mode', false)
+  .option('-c, --cluster', 'run a cluster', false)
+  .action(function(args) {
+    require("../lib/commands/start")(load(args), args.dev, args.cluster);
   });
 
 startup
   .command("middleware")
   .description("list middleware installed")
-  .action(function() {
-    require("../lib/commands/middleware")(path, startup.dev);
+  .option('-p, --path <path>', 'path to file')
+  .option('-d, --dev', 'run in development mode', false)
+  .action(function(args) {
+    require("../lib/commands/middleware")(load(args), args.dev);
   });
 
 startup
   .command("settings")
   .description("list app settings")
-  .action(function() {
-    require("../lib/commands/settings")(path, startup.dev);
+  .option('-p, --path <path>', 'path to file')
+  .option('-d, --dev', 'run in development mode', false)
+  .action(function(args) {
+    require("../lib/commands/settings")(load(args), args.dev);
   });
 
 startup
   .command("routes")
   .description("list app routes")
-  .action(function() {
-    require("../lib/commands/routes")(path, startup.dev);
+  .option('-p, --path <path>', 'path to file')
+  .option('-d, --dev', 'run in development mode', false)
+  .action(function(args) {
+    require("../lib/commands/routes")(load(args), args.dev);
   });
 
 startup.parse(process.argv);
+
+if (!startup.args.length) startup.help();
