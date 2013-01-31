@@ -84,7 +84,7 @@ Lists app settings (express only) without running the app.
 Port Binding
 ------------
 
-`startup` will look for the `PORT` environment variable and try to bind to it. If not value is found, it defaults to `3000`.
+`startup` will look for the `PORT` environment variable and try to bind to it. If not value is found, it defaults to `3000`. You can also set it by executing `startup start -P <port>`.
 
 Hot-Reload
 ----------
