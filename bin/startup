@@ -5,6 +5,7 @@
  */
 
 var startup = require('commander')
+  , resolve = require('path').resolve
   , join = require('path').join;
 
 startup
@@ -12,7 +13,7 @@ startup
 
 function load(args) {
   if (args.path) {
-    return join(process.cwd(), args.path);
+    return resolve(process.cwd(), args.path);
   }
   else {
     try {
