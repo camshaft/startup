@@ -32,9 +32,9 @@ startup
   .option('-p, --path <path>', 'path to file')
   .option('-d, --dev', 'run in development mode', false)
   .option('-c, --cluster', 'run a cluster', false)
-  .option('-P, --port <port>', 'port on which to bind', 3000)
+  .option('-P, --port <port>', 'port on which to bind', (process.env.PORT || 3000))
   .action(function(args) {
-    process.env.PORT = process.env.PORT || args.port;
+    process.env.PORT = args.port;
     require("../lib/commands/start")(load(args), args.dev, args.cluster);
   });
 
