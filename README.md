@@ -63,6 +63,56 @@ startup start
 
 and startup will bind to the `PORT` environment variable.
 
+### Sockjs Example
+
+To install any handlers needed, sockjs for example, listen for the `ready` event:
+
+```js
+var express = require("express")
+  , sockjs = require("sockjs");
+
+// Export the express app
+var app = module.exports = express();
+
+// Setup the sockjs server
+var echo = sockjs.createServer();
+echo.on('connection', function(conn) {
+  conn.on('data', function(message) {
+    conn.write(message);
+  });
+  conn.on('close', function() {});
+});
+
+app.get("/", function (req, res){
+  res.send("Hello!");
+});
+
+// Install the handlers
+app.on("ready", function(server){
+  echo.installHandlers(server, {prefix: "/echo"});
+});
+```
+
+### Listening Callback
+
+To know when the server is listening on a port, bind to the `listening` event:
+
+```js
+var express = require("express");
+
+// Export the express app
+var app = module.exports = express();
+
+app.get("/", function (req, res){
+  res.send("Hello!");
+});
+
+app.on("listening", function(server){
+  console.log("My app is listening");
+});
+```
+
+
 Commands
 --------
 
