@@ -171,7 +171,7 @@ module.exports.errorHandler = function (err, req, res) {
 Cluster
 -------
 
-[Cluster](http://nodejs.org/api/cluster.html) allows a server to take advantage of all of the cores on a system instead of being limited by node's single thread. Executing `startup start --cluster` will enable cluster mode for all of the cpu's on the machine.
+[Cluster](http://nodejs.org/api/cluster.html) allows a server to take advantage of all of the cores on a system instead of being limited by node's single thread. Cluster mode is enabled by default in production.
 
 
 SIGTERM and SIGINT

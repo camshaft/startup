@@ -1,6 +1,6 @@
 {
   "name": "startup",
-  "version": "0.1.12",
+  "version": "0.2.0beta",
   "description": "Node.js HTTP app runner",
   "scripts": {
     "test": "./node_modules/.bin/mocha"
@@ -24,7 +24,7 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "engines": {
-    "node": "0.8.x"
+    "node": ">=0.8.x"
   },
   "dependencies": {
     "commander": "~1.1.1",

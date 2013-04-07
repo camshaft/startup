@@ -32,11 +32,10 @@ startup
   .description("start app server")
   .option('-p, --path <path>', 'path to file')
   .option('-d, --dev', 'run in development mode', false)
-  .option('-c, --cluster', 'run a cluster', false)
   .option('-P, --port <port>', 'port on which to bind', (process.env.PORT || 3000))
   .action(function(args) {
     process.env.PORT = args.port;
-    require("../lib/commands/start")(load(args), args.dev, args.cluster);
+    require("../lib/commands/start")(load(args), args.dev);
   });
 
 startup
