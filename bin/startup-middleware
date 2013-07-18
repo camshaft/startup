@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var program = require('commander');
+var utils = require('../lib/utils');
+var fs = require('fs');
+var join = require('path').join;
+var resolve = require('path').resolve;
+var exists = fs.existsSync;
+var Table = require('cli-table');
+
+/**
+ * options
+ */
+
+program
+  .option('-a, --app <path>', 'path to the application file')
+  .option('-p, --path <path>', 'path to the application file (deprecated)');
+
+/**
+ * examples
+ */
+
+program.on('--help', function(){
+  console.log('  Examples:');
+  console.log();
+  process.exit();
+});
+
+/**
+ * parse argv
+ */
+
+program.parse(process.argv);
+
+/**
+ * resolve the app path
+ */
+
+var path = utils.resolve(program.app || program.path);
+
+/**
+ * make sure the app exists
+ */
+
+if (!exists(path)) utils.fatal('missing main app (defaults to ' + path + ')');
+
+var app = require(path);
+
+if (!app.stack) utils.fatal('Express or Connect required for this command');
+
+var table = new Table({
+  head: ['Route', 'Name', 'config'],
+  colWidths: [20, 30, 80]
+});
+
+app.stack.forEach(function(middleware) {
+  var name = middleware.name || middleware.handle.name || '';
+  var configNames = [];
+  var config = middleware.config || middleware.handle.config;
+  if (config) {
+    var properties = Object.getOwnPropertyNames(config);
+    for (var i = properties.length - 1; i >= 0; i--) {
+      configNames.push('config.' + (name.length > 0 ? name + '.' : '') + properties[i] + ': ' + config[properties[i]]);
+    };
+  }
+  table.push([(middleware.route || '/'), name, configNames.join('\n')]);
+});
+
+console.log(table.toString());

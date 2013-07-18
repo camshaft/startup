@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var program = require('commander');
+var utils = require('../lib/utils');
+var fs = require('fs');
+var join = require('path').join;
+var resolve = require('path').resolve;
+var exists = fs.existsSync;
+var Table = require('cli-table');
+
+/**
+ * options
+ */
+
+program
+  .option('-a, --app <path>', 'path to the application file')
+  .option('-p, --path <path>', 'path to the application file (deprecated)');
+
+/**
+ * examples
+ */
+
+program.on('--help', function(){
+  console.log('  Examples:');
+  console.log();
+  process.exit();
+});
+
+/**
+ * parse argv
+ */
+
+program.parse(process.argv);
+
+/**
+ * resolve the app path
+ */
+
+var path = utils.resolve(program.app || program.path);
+
+/**
+ * make sure the app exists
+ */
+
+if (!exists(path)) utils.fatal('missing main app (defaults to ' + path + ')');
+
+var app = require(path);
+
+if (!app.settings) {
+  console.error('Express required for this command');
+  process.exit(1);
+}
+
+var table = new Table({
+  head: ['Key', 'Value'],
+  colWidths: [20, 80]
+});
+
+for(var key in app.settings) {
+  table.push([key, app.settings[key]]);
+}
+
+console.log(table.toString());

@@ -4,67 +4,83 @@
  * Module dependencies.
  */
 
-var startup = require('commander')
-  , resolve = require('path').resolve
-  , join = require('path').join;
+var program = require('commander');
+var spawn = require('win-fork');
+var path = require('path');
+var fs = require('fs');
+var join = path.join;
+var exists = fs.existsSync;
 
-startup
-  .version(require(join(__dirname, "../package.json")).version);
+/**
+ * usage
+ */
 
-function load(args) {
-  if (args.path) {
-    return resolve(process.cwd(), args.path);
-  }
-  else {
-    try {
-      // Try to find it in the `package.json`
-      return join(process.cwd(), require(join(process.cwd(), "package.json")).main);
-    }
-    catch (e) {
-      // Default to `app.js`
-      return join(process.cwd(), 'app');
-    }
-  }
-};        
+program
+  .version(require('../package').version)
+  .usage('<command> [options]');
 
-startup
-  .command("start")
-  .description("start app server")
-  .option('-p, --path <path>', 'path to file')
-  .option('-d, --dev', 'run in development mode', false)
-  .option('-P, --port <port>', 'port on which to bind', (process.env.PORT || 3000))
-  .action(function(args) {
-    process.env.PORT = args.port;
-    require("../lib/commands/start")(load(args), args.dev);
-  });
+/**
+ * sub-command help
+ */
 
-startup
-  .command("middleware")
-  .description("list middleware installed")
-  .option('-p, --path <path>', 'path to file')
-  .option('-d, --dev', 'run in development mode', false)
-  .action(function(args) {
-    require("../lib/commands/middleware")(load(args), args.dev);
-  });
+program.on('--help', function(){
+  console.log('  Commands:');
+  console.log();
+  console.log('    start                   start an app');
+  console.log('    middleware              list application middleware');
+  console.log('    routes                  list application routes');
+  console.log('    settings                show application settings');
+  console.log();
+  process.exit();
+});
 
-startup
-  .command("settings")
-  .description("list app settings")
-  .option('-p, --path <path>', 'path to file')
-  .option('-d, --dev', 'run in development mode', false)
-  .action(function(args) {
-    require("../lib/commands/settings")(load(args), args.dev);
-  });
+/**
+ * parse argv
+ */
 
-startup
-  .command("routes")
-  .description("list app routes")
-  .option('-p, --path <path>', 'path to file')
-  .option('-d, --dev', 'run in development mode', false)
-  .action(function(args) {
-    require("../lib/commands/routes")(load(args), args.dev);
-  });
+program.parse(process.argv);
 
-startup.parse(process.argv);
+/**
+ * args void of cmd
+ */
 
-if (!startup.args.length) startup.help();
+var args = process.argv.slice(3);
+
+/**
+ * command
+ */
+
+var cmd = program.args[0];
+
+/**
+ * display help
+ */
+
+if (!cmd) {
+  process.stdout.write(program.helpInformation());
+  program.emit('--help');
+  process.exit();
+}
+
+/**
+ * executable
+ */
+
+var bin = 'startup-' + cmd;
+
+/**
+ * local
+ */
+
+var local = join(__dirname, bin);
+if (exists(local)) bin = local;
+
+/**
+ * spawn
+ */
+
+var proc = spawn(bin, args, { stdio: 'inherit', customFds: [0, 1, 2] });
+
+proc.on('close', function(code){
+  process.exit(code);
+});

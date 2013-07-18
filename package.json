@@ -15,6 +15,7 @@
   "keywords": [
     "app",
     "runner",
+    "cluster",
     "express",
     "connect",
     "http",
@@ -29,8 +30,9 @@
   "dependencies": {
     "commander": "~1.1.1",
     "cli-table": "~0.2.0",
-    "node-dev": "~0.2.0",
-    "node-uuid": "~1.4.0"
+    "node-uuid": "~1.4.0",
+    "win-fork": "~1.1.1",
+    "node-dev": "~2.0.1"
   },
   "devDependencies": {
     "should": "~1.2.1",

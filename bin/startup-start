@@ -1,0 +1,188 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var program = require('commander');
+var utils = require('../lib/utils');
+var spawn = require('win-fork');
+var cluster = require('cluster');
+var fs = require('fs');
+var cpus = require('os').cpus().length;
+var join = require('path').join;
+var resolve = require('path').resolve;
+var exists = fs.existsSync;
+
+/**
+ * options
+ */
+
+program
+  .option('-a, --app <path>', 'path to the application file')
+  .option('-p, --path <path>', 'path to the application file (deprecated)')
+  .option('-d, --dev', 'run in development mode')
+  .option('--debug', 'run the debugger')
+  .option('--debug-brk', 'run the debugger with a break on start')
+  .option('-t, --timeout', 'worker restart timeout')
+  .option('-w, --workers <workers>', 'number of worker processes', cpus)
+  .option('-P, --port <port>', 'listening port');
+
+/**
+ * examples
+ */
+
+program.on('--help', function(){
+  console.log('  Examples:');
+  console.log();
+  console.log('    # default settings');
+  console.log('    $ startup start');
+  console.log();
+  console.log('    # listen on port 8080');
+  console.log('    $ startup start -P 8080');
+  console.log();
+  console.log('    # development mode');
+  console.log('    $ startup start -d');
+  process.exit();
+});
+
+/**
+ * parse argv
+ */
+
+program.parse(process.argv);
+
+/**
+ * resolve the app path
+ */
+
+var path = utils.resolve(program.app || program.path);
+
+/**
+ * resolve the runner path
+ */
+
+var runner = resolve(__dirname, '../lib/runner');
+
+/**
+ * make sure the app exists
+ */
+
+if (!exists(path)) utils.fatal('missing main app (defaults to ' + path + ')');
+
+/**
+ * run in debug mode
+ */
+
+if (program.debug || program['debug-brk']) {
+  // check the type of debugging
+  var debug = program.debug
+    ? '--debug'
+    : '--debug-brk';
+
+  // setup the arguments
+  var args = [
+    debug,
+    runner,
+    path
+  ];
+
+  var proc = spawn('node', args, { stdio: 'inherit', customFds: [0, 1, 2] });
+
+  return proc.on('close', function(code){
+    process.exit(code);
+  });
+}
+
+/**
+ * run in development mode
+ */
+
+if (program.dev || process.env.NODE_ENV === 'development') {
+  utils.log('info', 'auto-reload enabled');
+
+  var cmd = resolve(__dirname, '../node_modules/.bin/node-dev');
+
+  // setup the arguments
+  var args = [
+    runner,
+    path
+  ];
+
+  var proc = spawn(cmd, args, { stdio: 'inherit', customFds: [0, 1, 2] });
+
+  return proc.on('close', function(code){
+    process.exit(code);
+  });
+}
+
+/**
+ * run in production mode
+ */
+
+cluster.setupMaster({
+  exec: runner,
+  args: [path]
+});
+
+/**
+ * spin up worker processes
+ */
+
+for (var i = 0; i < program.workers; i++) {
+  cluster.fork(process.env);
+};
+
+/**
+ * handle worker disconnects
+ */
+
+cluster.on('disconnect', function(worker) {
+  // if we are shutting down ourselves or the cluster hasn't started yet don't do anything
+  if (cluster.disconnecting || !worker.started) return;
+
+  cluster.fork(process.env);
+});
+
+/**
+ * mark a worker as listening
+ */
+
+cluster.on('listening', function(worker, address) {
+  // mark the worker as started
+  worker.started = true;
+});
+
+/**
+ * handle any signals we get
+ */
+
+process.once('SIGTERM', handleSignal('SIGTERM'));
+process.once('SIGINT', handleSignal('SIGINT'));
+
+function handleSignal(message) {
+  return function() {
+    // if we are already disconnecting don't do anything
+    if (cluster.disconnecting) return;
+
+    // mark the cluster as disconnecting
+    cluster.disconnecting = true;
+
+    // Give workers just a bit more time to die on their own
+    var killTimer = setTimeout(function() {
+      for (var id in cluster.workers) {
+        var worker = cluster.workers[id];
+        worker.process.kill('SIGKILL');
+      }
+    }, 7000+300);
+
+    // Dereference it from the loop
+    if (killTimer.unref) killTimer.unref();
+
+    // all of the workers disconnected
+    cluster.disconnect(function(){
+      console.log('Shutting down master');
+      clearTimeout(killTimer);
+    });
+  };
+};
