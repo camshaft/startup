@@ -24,6 +24,7 @@ program
   .option('-d, --dev', 'run in development mode')
   .option('--debug', 'run the debugger')
   .option('--debug-brk', 'run the debugger with a break on start')
+  .option('-s, --shutdown', 'server shutdown timeout')
   .option('-t, --timeout', 'worker restart timeout')
   .option('-w, --workers <workers>', 'number of worker processes', cpus)
   .option('-P, --port <port>', 'listening port');
@@ -74,7 +75,7 @@ if (!exists(path)) utils.fatal('missing main app (defaults to ' + path + ')');
  * run in debug mode
  */
 
-if (program.debug || program['debug-brk']) {
+if (program.debug || program.debugBrk) {
   // check the type of debugging
   var debug = program.debug
     ? '--debug'
@@ -149,7 +150,6 @@ cluster.on('disconnect', function(worker) {
  */
 
 cluster.on('listening', function(worker, address) {
-  // mark the worker as started
   worker.started = true;
 });
 
@@ -168,15 +168,15 @@ function handleSignal(message) {
     // mark the cluster as disconnecting
     cluster.disconnecting = true;
 
-    // Give workers just a bit more time to die on their own
+    // dive workers just a bit more time to die on their own
     var killTimer = setTimeout(function() {
       for (var id in cluster.workers) {
         var worker = cluster.workers[id];
         worker.process.kill('SIGKILL');
       }
-    }, 7000+300);
+    }, program.shutdown + 300);
 
-    // Dereference it from the loop
+    // dereference it from the loop
     if (killTimer.unref) killTimer.unref();
 
     // all of the workers disconnected
