@@ -24,6 +24,7 @@ program
   .option('-d, --dev', 'run in development mode')
   .option('--debug', 'run the debugger')
   .option('--debug-brk', 'run the debugger with a break on start')
+  .option('--use-strict', 'use strict mode', false)
   .option('-s, --shutdown', 'server shutdown timeout')
   .option('-t, --timeout', 'worker restart timeout')
   .option('-w, --workers <workers>', 'number of worker processes', cpus)
@@ -72,11 +73,18 @@ var runner = resolve(__dirname, '../lib/runner');
 if (!exists(path)) utils.fatal('missing main app (defaults to ' + path + ')');
 
 /**
+ * Firgure out if we are running in strict mode
+ */
+
+var strict = program.useStrict
+  ? '--use-strict'
+  : false;
+
+/**
  * run in debug mode
  */
 
 if (program.debug || program.debugBrk) {
-  // check the type of debugging
   var debug = program.debug
     ? '--debug'
     : '--debug-brk';
@@ -87,6 +95,8 @@ if (program.debug || program.debugBrk) {
     runner,
     path
   ];
+
+  if (strict) args.unshift(strict);
 
   var proc = spawn('node', args, { stdio: 'inherit', customFds: [0, 1, 2] });
 
@@ -104,11 +114,12 @@ if (program.dev || process.env.NODE_ENV === 'development') {
 
   var cmd = resolve(__dirname, '../node_modules/.bin/node-dev');
 
-  // setup the arguments
   var args = [
     runner,
     path
   ];
+
+  if (strict) args.unshift(strict);
 
   var proc = spawn(cmd, args, { stdio: 'inherit', customFds: [0, 1, 2] });
 
@@ -121,9 +132,15 @@ if (program.dev || process.env.NODE_ENV === 'development') {
  * run in production mode
  */
 
+var args = [
+  path
+];
+
+if (strict) args.unshift(strict);
+
 cluster.setupMaster({
   exec: runner,
-  args: [path]
+  args: args
 });
 
 /**
