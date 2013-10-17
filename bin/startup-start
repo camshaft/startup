@@ -24,9 +24,10 @@ program
   .option('-d, --dev', 'run in development mode')
   .option('--debug', 'run the debugger')
   .option('--debug-brk', 'run the debugger with a break on start')
-  .option('--use-strict', 'use strict mode', false)
-  .option('-s, --shutdown', 'server shutdown timeout')
-  .option('-t, --timeout', 'worker restart timeout')
+  .option('--use-strict', 'use strict mode')
+  // .option('-s, --shutdown <shutdown>', 'server shutdown timeout')
+  // .option('-t, --timeout <timeout>', 'worker restart timeout')
+  // .option('-l, --too-busy <toobusy>', 'too busy lag')
   .option('-w, --workers <workers>', 'number of worker processes', cpus)
   .option('-P, --port <port>', 'listening port');
 
