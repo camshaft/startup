@@ -1,6 +1,6 @@
 {
   "name": "startup",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Node.js HTTP app runner",
   "scripts": {
     "test": "./node_modules/.bin/mocha"
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/CamShaft/startup.git"
+    "url": "git://github.com/camshaft/startup.git"
   },
   "keywords": [
     "app",
@@ -21,7 +21,7 @@
     "http",
     "development"
   ],
-  "author": "Cameron Bytheway <cameron@nujii.com>",
+  "author": "Cameron Bytheway <bytheway.cameron@gmail.com>",
   "license": "MIT",
   "readmeFilename": "README.md",
   "engines": {
