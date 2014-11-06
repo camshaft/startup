@@ -74,12 +74,18 @@ var runner = resolve(__dirname, '../lib/runner');
 if (!exists(path)) utils.fatal('missing main app (defaults to ' + path + ')');
 
 /**
- * Firgure out if we are running in strict mode
+ * Figure out if we are running in strict mode
  */
 
 var strict = program.useStrict
   ? '--use-strict'
   : false;
+
+/**
+ * define port
+ */
+
+if (program.port) process.env.PORT = program.port;
 
 /**
  * run in debug mode
