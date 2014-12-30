@@ -29,6 +29,7 @@ program
   // .option('-t, --timeout <timeout>', 'worker restart timeout')
   // .option('-l, --too-busy <toobusy>', 'too busy lag')
   .option('-w, --workers <workers>', 'number of worker processes', cpus)
+  .option('-R, --worker-rotation <interval>', 'rotate workers every interval', cpus)
   .option('-P, --port <port>', 'listening port');
 
 /**
@@ -154,8 +155,9 @@ cluster.setupMaster({
  * spin up worker processes
  */
 
+var currentWorkers = [];
 for (var i = 0; i < program.workers; i++) {
-  cluster.fork(process.env);
+  currentWorkers.push(cluster.fork(process.env));
 };
 
 /**
@@ -166,7 +168,7 @@ cluster.on('disconnect', function(worker) {
   // if we are shutting down ourselves or the cluster hasn't started yet don't do anything
   if (cluster.disconnecting || !worker.started) return;
 
-  cluster.fork(process.env);
+  currentWorkers.push(cluster.fork(process.env));
 });
 
 /**
@@ -210,3 +212,12 @@ function handleSignal(message) {
     });
   };
 };
+
+if (program.workerRotation) {
+  setInterval(function() {
+    if (cluster.disconnecting) return;
+    var worker = currentWorkers.shift();
+    worker.process.kill('SIGTERM');
+    worker.disconnect();
+  }, parseInt(program.workerRotation, 10)).unref();
+}
