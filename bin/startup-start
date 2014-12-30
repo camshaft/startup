@@ -29,7 +29,7 @@ program
   // .option('-t, --timeout <timeout>', 'worker restart timeout')
   // .option('-l, --too-busy <toobusy>', 'too busy lag')
   .option('-w, --workers <workers>', 'number of worker processes', cpus)
-  .option('-R, --worker-rotation <interval>', 'rotate workers every interval', cpus)
+  .option('-R, --worker-rotation <interval>', 'rotate workers every interval')
   .option('-P, --port <port>', 'listening port');
 
 /**
