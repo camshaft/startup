@@ -1,6 +1,6 @@
 {
   "name": "startup",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Node.js HTTP app runner",
   "scripts": {
     "test": "./node_modules/.bin/mocha"
