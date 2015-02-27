@@ -25,6 +25,7 @@ program
   .option('-d, --dev', 'run in development mode')
   .option('--debug', 'run the debugger')
   .option('--debug-brk', 'run the debugger with a break on start')
+  .option('--node-inspector', 'run node-debug to enable debugging in the browser')
   .option('--use-strict', 'use strict mode')
   // .option('-s, --shutdown <shutdown>', 'server shutdown timeout')
   // .option('-t, --timeout <timeout>', 'worker restart timeout')
@@ -108,6 +109,25 @@ if (program.debug || program.debugBrk) {
   if (strict) args.unshift(strict);
 
   var proc = spawn('node', args, { stdio: 'inherit', customFds: [0, 1, 2] });
+
+  return proc.on('close', function(code){
+    process.exit(code);
+  });
+}
+
+/**
+ * Run in debug mode using node-inspector
+ */
+if (program.nodeInspector) {
+  // setup the arguments
+  var args = [
+    runner,
+    path
+  ];
+
+  if (strict) args.unshift(strict);
+
+  var proc = spawn('node-debug', args, { stdio: 'inherit', customFds: [0, 1, 2] });
 
   return proc.on('close', function(code){
     process.exit(code);
