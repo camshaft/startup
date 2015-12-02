@@ -11,6 +11,7 @@ var cluster = require('cluster');
 var fs = require('fs');
 var cpus = require('os').cpus().length;
 var join = require('path').join;
+var dirname = require('path').dirname;
 var resolve = require('path').resolve;
 var exists = fs.existsSync;
 
@@ -120,7 +121,7 @@ if (program.debug || program.debugBrk) {
 if (program.dev || process.env.NODE_ENV === 'development') {
   utils.log('info', 'auto-reload enabled');
 
-  var cmd = require.resolve('node-dev/bin/node-dev');
+  var cmd = process.env.STARTUP_DEV_SCRIPT || require.resolve('node-dev/bin/node-dev');
 
   var args = [
     runner,
