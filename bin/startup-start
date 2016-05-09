@@ -121,7 +121,7 @@ if (program.debug || program.debugBrk) {
 if (program.dev || process.env.NODE_ENV === 'development') {
   utils.log('info', 'auto-reload enabled');
 
-  var cmd = resolve(dirname(require.resolve('node-dev/package.json')), './bin/node-dev');
+  var cmd = process.env.STARTUP_DEV_SCRIPT || resolve(dirname(require.resolve('node-dev/package.json')), './bin/node-dev');
 
   var args = [
     runner,
