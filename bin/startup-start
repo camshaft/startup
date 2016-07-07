@@ -119,7 +119,7 @@ if (program.debug || program.debugBrk) {
 if (program.dev || process.env.NODE_ENV === 'development') {
   utils.log('info', 'auto-reload enabled');
 
-  var cmd = require.resolve('node-dev').split('node_modules')[0] + 'node_modules/.bin/node-dev';
+  var cmd = require.resolve('node-dev/bin/node-dev');
 
   var args = [
     runner,
