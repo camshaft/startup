@@ -14,8 +14,7 @@ var join = require('path').join;
 var dirname = require('path').dirname;
 var resolve = require('path').resolve;
 var exists = fs.existsSync;
-var nodeVersion = parseVersion(process.versions.node);
-var args, proc;
+var nodeVersion, args, proc;
 
 /**
  * options
@@ -99,12 +98,15 @@ if (program.port) process.env.PORT = program.port;
 
 var inspect = false;
 
-if (program.inspect && (nodeVersion.major > 6 || (nodeVersion.major === 6 && nodeVersion.minor > 2))) {
-  inspect = true;
-}
-else {
-  var err = '\x1B[93m\x1B[5mWrong Node Version.\n\x1b[0m\x1B[97m\x1B[41mTo use the `--inspect` parameter you must be using node.js version 6.3 or greater.\nCurrently you are using node.js version: \x1B[96m'+process.version+'\x1B[0m\n';
-  throw new Error(err);
+if (program.inspect) {
+  nodeVersion = parseVersion(process.versions.node);
+  if (nodeVersion.major > 6 || (nodeVersion.major === 6 && nodeVersion.minor > 2)) {
+    inspect = true;
+  }
+  else {
+    var err = '\x1B[93m\x1B[5mWrong Node Version.\n\x1b[0m\x1B[97m\x1B[41mTo use the `--inspect` parameter you must be using node.js version 6.3 or greater.\nCurrently you are using node.js version: \x1B[96m'+process.version+'\x1B[0m\n';
+    throw new Error(err);
+  }
 }
 
 if (program.debug || program.debugBrk || inspect) {
