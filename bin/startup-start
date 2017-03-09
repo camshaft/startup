@@ -14,6 +14,7 @@ var join = require('path').join;
 var dirname = require('path').dirname;
 var resolve = require('path').resolve;
 var exists = fs.existsSync;
+var nodeVersion, args, proc;
 
 /**
  * options
@@ -25,7 +26,9 @@ program
   .option('-d, --dev', 'run in development mode')
   .option('--debug', 'run the debugger')
   .option('--debug-brk', 'run the debugger with a break on start')
+  .option('--node-inspector', 'run node-debug to enable debugging in the browser')
   .option('--use-strict', 'use strict mode')
+  .option('--inspect', 'Node 6.3+ Inspector to enable Chrome Dev tools debugging')
   // .option('-s, --shutdown <shutdown>', 'server shutdown timeout')
   // .option('-t, --timeout <timeout>', 'worker restart timeout')
   // .option('-l, --too-busy <toobusy>', 'too busy lag')
@@ -93,21 +96,75 @@ if (program.port) process.env.PORT = program.port;
  * run in debug mode
  */
 
-if (program.debug || program.debugBrk) {
-  var debug = program.debug
-    ? '--debug'
-    : '--debug-brk';
+var inspect = false;
+
+if (program.inspect) {
+  nodeVersion = parseVersion(process.versions.node);
+  if (nodeVersion.major > 6 || (nodeVersion.major === 6 && nodeVersion.minor > 2)) {
+    inspect = true;
+  }
+  else {
+    var err = '\x1B[93m\x1B[5mWrong Node Version.\n\x1b[0m\x1B[97m\x1B[41mTo use the `--inspect` parameter you must be using node.js version 6.3 or greater.\nCurrently you are using node.js version: \x1B[96m'+process.version+'\x1B[0m\n';
+    throw new Error(err);
+  }
+}
+
+if (program.debug || program.debugBrk || inspect) {
+  var debug = program.debugBrk
+    ? '--debug-brk'
+    : '--debug';
 
   // setup the arguments
-  var args = [
+  args = [
     debug,
+    runner,
+    path
+  ];
+
+  if (inspect) args.unshift('--inspect');
+  if (strict) args.unshift(strict);
+
+  proc = spawn('node', args, {stdio: ['inherit','inherit','pipe']});
+  var needToLaunchChrome = inspect;
+
+  proc.stderr.on('data', (data) => {
+    var str = data.toString('utf8');
+    process.stderr.write(str);
+    if (needToLaunchChrome) {
+      var i = str.indexOf('chrome-devtools:');
+      if (i > -1) {
+        var url = str.substr(i);
+        i = url.indexOf('\n');
+        if (i > -1) {
+          url = url.substring(0,i);
+        }
+
+        url = url.replace(':', '/:');
+        spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [url]);
+        process.stderr.write('----------\n\n\x1b[33mAfter Chrome is launched you must remove the first back-slash "/" in the URL to enable the debugger.\n\x1b[33mChange \x1b[107m\x1b[30m chrome-devtools\x1b[43m/\x1b[107m:// \x1b[49m\x1b[33m to \x1b[107m\x1b[30m chrome-devtools:// \x1b[49m\x1b[33m\n\x1b[33mRemember to close old instances of the debugger/browser windows.\x1B[0m\n\n----------\n');
+        needToLaunchChrome = false;
+      }
+    }
+  });
+
+  return proc.on('close', function(code){
+    process.exit(code);
+  });
+}
+
+/**
+ * Run in debug mode using node-inspector
+ */
+if (program.nodeInspector) {
+  // setup the arguments
+  args = [
     runner,
     path
   ];
 
   if (strict) args.unshift(strict);
 
-  var proc = spawn('node', args, { stdio: 'inherit', customFds: [0, 1, 2] });
+  proc = spawn('node-debug', args, { stdio: 'inherit', customFds: [0, 1, 2] });
 
   return proc.on('close', function(code){
     process.exit(code);
@@ -123,14 +180,14 @@ if (program.dev || process.env.NODE_ENV === 'development') {
 
   var cmd = process.env.STARTUP_DEV_SCRIPT || require.resolve('node-dev/bin/node-dev');
 
-  var args = [
+  args = [
     runner,
     path
   ];
 
   if (strict) args.unshift(strict);
 
-  var proc = spawn(cmd, args, { stdio: 'inherit', customFds: [0, 1, 2] });
+  proc = spawn(cmd, args, { stdio: 'inherit', customFds: [0, 1, 2] });
 
   return proc.on('close', function(code){
     process.exit(code);
@@ -141,7 +198,7 @@ if (program.dev || process.env.NODE_ENV === 'development') {
  * run in production mode
  */
 
-var args = [
+args = [
   path
 ];
 
@@ -159,7 +216,7 @@ cluster.setupMaster({
 var currentWorkers = [];
 for (var i = 0; i < program.workers; i++) {
   currentWorkers.push(cluster.fork(process.env));
-};
+}
 
 /**
  * handle worker disconnects
@@ -212,7 +269,7 @@ function handleSignal(message) {
       clearTimeout(killTimer);
     });
   };
-};
+}
 
 if (program.workerRotation) {
   setInterval(function() {
@@ -221,4 +278,14 @@ if (program.workerRotation) {
     worker.process.kill('SIGTERM');
     worker.disconnect();
   }, parseInt(program.workerRotation, 10)).unref();
+}
+
+
+function parseVersion(ver) {
+  var parts = ver.split('.');
+  return {
+    major: parseInt(parts[0] || 0, 10),
+    minor: parseInt(parts[1] || 0, 10),
+    patch: parseInt(parts[2] || 0, 10)
+  };
 }

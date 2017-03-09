@@ -132,6 +132,15 @@ Lists loaded middleware (express only) without running the app.
 
 Lists app settings (express only) without running the app.
 
+Debugging Options
+-----------------
+
+There are 3 debugging options:
+
+* `start --debug`  This option works the same as running `node --debug`.
+* `start --debug-brk`  This option works the same as running `node --debug-brk`.
+* `start --node-inspector`  This option uses [node-inspector](https://github.com/node-inspector/node-inspector).
+
 Port Binding
 ------------
 
