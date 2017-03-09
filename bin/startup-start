@@ -139,7 +139,7 @@ if (program.debug || program.debugBrk || inspect) {
 
         url = url.replace(':', '/:');
         spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [url]);
-        process.stderr.write('\n\x1b[33mAfter Chrome is launched you must remove the first back-slash "/" in the URL to enable the debugger.\nChange \x1b[107m\x1b[30m chrome-devtools\x1b[43m/\x1b[107m:// \x1b[49m\x1b[33m to \x1b[107m\x1b[30m chrome-devtools:// \x1b[49m\x1b[33m\nRemember to close old instances of the debugger/browser windows.\x1B[0m');
+        process.stderr.write('----------\n\n\x1b[33mAfter Chrome is launched you must remove the first back-slash "/" in the URL to enable the debugger.\n\x1b[33mChange \x1b[107m\x1b[30m chrome-devtools\x1b[43m/\x1b[107m:// \x1b[49m\x1b[33m to \x1b[107m\x1b[30m chrome-devtools:// \x1b[49m\x1b[33m\n\x1b[33mRemember to close old instances of the debugger/browser windows.\x1B[0m\n\n----------\n');
         needToLaunchChrome = false;
       }
     }
