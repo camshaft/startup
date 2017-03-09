@@ -108,9 +108,9 @@ else {
 }
 
 if (program.debug || program.debugBrk || inspect) {
-  var debug = program.debug
-    ? '--debug'
-    : '--debug-brk';
+  var debug = program.debugBrk
+    ? '--debug-brk'
+    : '--debug';
 
   // setup the arguments
   args = [
